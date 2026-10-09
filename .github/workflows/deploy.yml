@@ -44,16 +44,21 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
 
+      # Three runs, median judged. The overall performance score only warns: shared
+      # runners vary too much for it to gate a deploy. Weight and layout shift do gate.
       - name: Lighthouse budget
         run: pnpm dlx @lhci/cli@0.15.1 autorun
 
-      - name: Upload Playwright report
+      - name: Upload test and Lighthouse reports
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
-          path: test-results
+          name: reports
+          path: |
+            test-results
+            .lighthouseci
           retention-days: 7
+          include-hidden-files: true
 
       - if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
