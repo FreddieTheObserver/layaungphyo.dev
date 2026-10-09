@@ -1,0 +1,144 @@
+---
+import { sections, site } from '../data/site';
+import { clockParts } from '../lib/clock';
+import { nb } from '../lib/text';
+import Keycap from './Keycap.astro';
+
+const clock = clockParts(new Date());
+---
+
+<header class="tmux">
+  <nav class="bar wrap" aria-label="sections">
+    <div class="left">
+      <a class="session t-key" href="#home">
+        {site.user}
+      </a>
+      <ol class="windows">
+        {sections.map((s, i) => (
+          <li>
+            <a
+              class="win t-small"
+              href={`#${s.id}`}
+              data-section={s.id}
+              aria-current={i === 0 ? 'location' : undefined}
+            >
+              {s.key}:{s.label}
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+    <div class="right">
+      <button
+        class="hint d-only t-small c-soft"
+        type="button"
+        data-palette-open
+        aria-haspopup="dialog"
+        aria-controls="palette"
+      >
+        <Keycap size="sm" data-modkey aria-hidden="true">
+          ⌘K
+        </Keycap>
+        palette
+      </button>
+      <p class="clock d-only t-small c-soft" aria-hidden="true">{nb('│  bkk ')}<time data-clock-time>{clock.time}</time>{nb('  │  ')}<span data-clock-date>{clock.date}</span></p>
+      <button
+        class="menu m-only t-small c-soft"
+        type="button"
+        data-palette-open
+        aria-haspopup="dialog"
+        aria-controls="palette"
+      >
+        <Keycap size="sm" aria-hidden="true">
+          ≡
+        </Keycap>
+        menu
+      </button>
+    </div>
+  </nav>
+</header>
+
+<style>
+  .tmux {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--paper-sunk);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--tmux-h);
+  }
+  .left,
+  .windows {
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+  .session {
+    display: flex;
+    align-items: center;
+    height: 30px;
+    padding: 0 14px;
+    background: var(--accent-fill);
+    color: var(--on-accent-fill);
+  }
+  .session:hover {
+    color: var(--on-accent-fill);
+  }
+  .windows li {
+    height: 100%;
+  }
+  .win {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 14px;
+    color: var(--ink-soft);
+  }
+  .win[aria-current] {
+    background: var(--card);
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .win[aria-current]::after {
+    content: '*';
+  }
+  .right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-right: 16px;
+  }
+  .hint,
+  .menu {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hint:hover,
+  .menu:hover {
+    color: var(--accent);
+  }
+
+  @media (max-width: 719px) {
+    .session {
+      height: 36px;
+      padding: 0 12px;
+    }
+    .win {
+      padding: 0 12px;
+    }
+    .windows li:has(.win:not([aria-current])) {
+      display: none;
+    }
+    .right {
+      padding-right: 0;
+    }
+    .menu {
+      padding: 6px 14px 6px 12px;
+    }
+  }
+</style>

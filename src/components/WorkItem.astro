@@ -1,0 +1,179 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { render } from 'astro:content';
+import { nb } from '../lib/text';
+import Diagram from './Diagram.astro';
+import Status from './Status.astro';
+import CineBookPlate from './plates/CineBookPlate.astro';
+import FloodwatchPlate from './plates/FloodwatchPlate.astro';
+
+interface Props {
+  entry: CollectionEntry<'projects'>;
+  index: number;
+}
+
+const { entry, index } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+---
+
+<details class="item" id={`project-${entry.id}`} open={d.open}>
+  <summary class="head">
+    <span class="idx t-label c-soft">{String(index).padStart(2, '0')}</span>
+    <h3 class="name t-h3">{d.name}/</h3>
+    <span class="summary t-small c-soft">{d.summary}</span>
+    <span class="stack t-label c-soft">{d.stack.join(' · ')}</span>
+    <span class="status t-label">
+      <Status status={d.status} />
+    </span>
+    <span class="chev t-small c-accent" aria-hidden="true"></span>
+  </summary>
+  <div class="panel">
+    <div class="media">
+      {d.media.kind === 'plate' && d.media.id === 'floodwatch' && <FloodwatchPlate />}
+      {d.media.kind === 'plate' && d.media.id === 'cinebook' && <CineBookPlate />}
+      {d.media.kind === 'diagram' && <Diagram id={d.media.id} />}
+    </div>
+    <div class="details">
+      <div class="desc t-body">
+        <Content />
+      </div>
+      <p class="t-small">
+        <span class="c-key">tags:</span>
+        <span class="c-soft">{nb(d.tags.join('  '))}</span>
+      </p>
+      {d.links.map((l) => (
+        <p class="t-small">
+          <a class="link c-accent" href={l.href} target="_blank" rel="noopener">
+            → {l.label}
+          </a>
+        </p>
+      ))}
+      <p class="hint t-label c-soft d-only">{nb('↵ toggle   ↑↓ next   esc close')}</p>
+    </div>
+  </div>
+</details>
+
+<style>
+  .item {
+    border-bottom: 1px solid var(--rule);
+  }
+  .head {
+    display: grid;
+    grid-template-columns: auto 230px minmax(0, 1fr) 250px 120px auto;
+    align-items: center;
+    column-gap: 24px;
+    padding: 22px 8px;
+    list-style: none;
+    cursor: pointer;
+  }
+  .head::-webkit-details-marker {
+    display: none;
+  }
+  .name {
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+  .item[open] .name,
+  .head:hover .name {
+    color: var(--accent);
+  }
+  .chev::before {
+    content: '▸';
+  }
+  .item[open] .chev::before {
+    content: '▾';
+  }
+  .panel {
+    display: grid;
+    grid-template-columns: 560px minmax(0, 1fr);
+    gap: 32px;
+    padding: 4px 8px 32px 50px;
+  }
+  .details {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .desc :global(p) {
+    margin: 0;
+  }
+  .desc :global(code) {
+    font: inherit;
+  }
+  .link:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .hint {
+    margin-top: auto;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .item {
+      interpolate-size: allow-keywords;
+    }
+    .item::details-content {
+      height: 0;
+      overflow: clip;
+      transition:
+        height 0.3s ease-out,
+        content-visibility 0.3s allow-discrete;
+    }
+    .item[open]::details-content {
+      height: auto;
+    }
+  }
+
+  @media (max-width: 1079px) {
+    .head {
+      grid-template-columns: auto 200px minmax(0, 1fr) 120px auto;
+    }
+    .stack {
+      display: none;
+    }
+    .panel {
+      grid-template-columns: minmax(0, 560px);
+    }
+  }
+
+  @media (max-width: 719px) {
+    .head {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-areas:
+        'idx name chev'
+        'summary summary summary'
+        'stack stack status';
+      column-gap: 10px;
+      row-gap: 6px;
+      padding: 16px 0;
+    }
+    .idx {
+      grid-area: idx;
+    }
+    .name {
+      grid-area: name;
+    }
+    .chev {
+      grid-area: chev;
+      justify-self: end;
+    }
+    .summary {
+      grid-area: summary;
+    }
+    .stack {
+      grid-area: stack;
+      display: block;
+    }
+    .status {
+      grid-area: status;
+      justify-self: end;
+    }
+    .panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 0 0 24px;
+    }
+  }
+</style>

@@ -1,0 +1,43 @@
+---
+import { diagrams } from '../data/diagrams';
+import { textGridSvg } from '../lib/ascii';
+
+interface Props {
+  id: keyof typeof diagrams;
+}
+
+const d = diagrams[Astro.props.id];
+// Box-drawing joins need the 132% line height.
+const grid = textGridSvg(d.runs, 1.32);
+---
+
+<figure class="diagram" style={`--w:${grid.cols * 7.2}px;--wm:${grid.cols * 6.6}px`}>
+  <svg class="tg" viewBox={grid.viewBox} aria-hidden="true" set:html={grid.inner} />
+  <figcaption class="sr-only">{d.description}</figcaption>
+</figure>
+
+<style>
+  .diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 24px;
+    border-radius: 4px;
+    background: var(--paper-sunk);
+  }
+  /* 12px JetBrains Mono on desktop, 11px on mobile, shrinking when the box is narrower. */
+  svg {
+    display: block;
+    width: min(var(--w), 100%);
+    height: auto;
+  }
+
+  @media (max-width: 719px) {
+    .diagram {
+      padding: 14px 12px;
+    }
+    svg {
+      width: min(var(--wm), 100%);
+    }
+  }
+</style>

@@ -1,0 +1,106 @@
+---
+import { nb } from '../../lib/text';
+import './plate.css';
+
+const at = (x: number, y: number, w?: number) => `--x:${x};--y:${y}${w ? `;--w:${w}` : ''}`;
+
+const ROWS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+// Column x positions leave aisles after seats 3 and 11.
+const COLS = [123, 151, 179, 219, 247, 275, 303, 331, 359, 387, 415, 455, 483, 511];
+const BOOKED = new Set(
+  'A1 A3 A4 A6 A7 A8 A9 A10 A11 A13 B4 B5 B10 B11 B13 B14 C3 C4 C6 C7 C8 C12 C14 D4 D5 D11 D12 D14 E3 E5 E9 F5 F6 F7 F9 F10 F12 F14 G2 G6 G11 H3 H7 H8 H11'.split(
+    ' ',
+  ),
+);
+const HELD = new Set(['C10', 'C11', 'E7']);
+
+/** A seat: 22x18 with 6px top corners and 3px bottom corners, optionally inset for an inside stroke. */
+function seat(x: number, y: number, inset = 0) {
+  const w = 22 - inset * 2;
+  const h = 18 - inset * 2;
+  const t = 6 - inset;
+  const b = 3 - inset;
+  x += inset;
+  y += inset;
+  return `M${x + t} ${y}H${x + w - t}A${t} ${t} 0 0 1 ${x + w} ${y + t}V${y + h - b}A${b} ${b} 0 0 1 ${x + w - b} ${y + h}H${x + b}A${b} ${b} 0 0 1 ${x} ${y + h - b}V${y + t}A${t} ${t} 0 0 1 ${x + t} ${y}Z`;
+}
+
+const seats = ROWS.flatMap((row, r) =>
+  COLS.map((x, c) => {
+    const id = `${row}${c + 1}`;
+    const kind = HELD.has(id) ? 'held' : BOOKED.has(id) ? 'booked' : 'free';
+    return { kind, d: seat(x, 124 + r * 26, kind === 'free' ? 0.625 : 0) };
+  }),
+);
+
+const label =
+  'Seat map for hall 3, 19:30 show. Two requests race for seat E7: request A holds it with 5:00 left, request B gets 409 seat taken. The invariant is one seat, one ticket, arbitrated by an advisory lock per showtime and backstopped by a partial unique index.';
+---
+
+<figure class="pl-box" role="img" aria-label={label}>
+  <div class="pl" aria-hidden="true">
+    <svg viewBox="0 0 636 460">
+      <rect class="f-ink" x="409" y="31" width="10" height="10" rx="3"></rect>
+      <rect class="f-accent" x="492" y="31" width="10" height="10" rx="3"></rect>
+      <rect class="f-none s-soft" x="559.625" y="31.625" width="8.75" height="8.75" rx="2.4" stroke-width="1.25"></rect>
+      <path class="f-none s-soft" d="M128 88Q328 56 528 88" stroke-width="2"></path>
+      {seats.map((s) => (
+        <path class={s.kind} d={s.d}></path>
+      ))}
+      <rect
+        class="f-none s-accent"
+        x="298.75"
+        y="223.75"
+        width="30.5"
+        height="26.5"
+        rx="8.25"
+        stroke-width="1.5"
+      ></rect>
+    </svg>
+
+    <span class="pl-t pl-cap" style={at(28, 28)}>
+      Fig. 02 · Hall 3, 19:30 show
+    </span>
+    <span class="pl-t pl-cap" style={at(427, 28)}>
+      Booked
+    </span>
+    <span class="pl-t pl-cap" style={at(510, 28)}>
+      Held
+    </span>
+    <span class="pl-t pl-cap" style={at(577, 28)}>
+      Free
+    </span>
+    <span class="pl-t pl-cap" style={at(304.5, 94)}>
+      Screen
+    </span>
+    {ROWS.map((row, r) => (
+      <span class="pl-t pl-cap" style={at(95, 125 + r * 26)}>
+        {row}
+      </span>
+    ))}
+
+    <div class="pl-card" style={`${at(28, 332, 372)};--gap:6`}>
+      <span class="pl-cap">Two requests, one seat</span>
+      <span class="pl-mono">{nb('A  hold E7  →  201 held, 5:00 left')}</span>
+      <span class="pl-mono">{nb('B  hold E7  →  ')}<span class="c-strong">409 seat taken</span></span>
+    </div>
+
+    <p class="pl-t pl-wrap pl-cap" style={at(424, 336, 184)}>
+      Invariant: one seat, one ticket. Arbiter: an advisory lock per showtime. Backstop: a partial unique index.
+    </p>
+  </div>
+</figure>
+
+<style>
+  .booked {
+    fill: var(--ink);
+  }
+  .held {
+    fill: var(--accent);
+  }
+  .free {
+    fill: none;
+    stroke: var(--ink-soft);
+    stroke-width: 1.25;
+  }
+</style>

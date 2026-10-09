@@ -1,0 +1,175 @@
+---
+import portrait from '../data/portrait.txt?raw';
+import { principles, spec } from '../data/profile';
+import { site } from '../data/site';
+import { portraitRuns, textGridSvg } from '../lib/ascii';
+import Prompt from './Prompt.astro';
+
+const face = textGridSvg(portraitRuns(portrait), 1.2);
+const swatches = ['--rule', '--on-ink-soft', '--ink-soft', '--ink', '--ok', '--accent'];
+---
+
+<section id="about" class="sec" tabindex="-1" aria-labelledby="about-title">
+  <div class="wrap pad">
+    <Prompt cmd="neofetch" />
+    <div class="heading">
+      <h2 id="about-title" class="t-h2">
+        <span class="c-heading">##</span> about
+      </h2>
+      <p class="t-small m-label c-soft">bangkok, th</p>
+    </div>
+
+    <div class="neofetch">
+      <svg class="portrait tg" viewBox={face.viewBox} aria-hidden="true" set:html={face.inner} />
+      <div class="info">
+        <div class="spec t-lead m-label">
+          <p>
+            <span class="c-user">{site.user}</span>@<span class="c-key">{site.host}</span>
+          </p>
+          <p class="c-soft" aria-hidden="true">
+            ───────────
+          </p>
+          <dl>
+            {spec.map(([key, value]) => (
+              <div class="row">
+                <dt class="c-key">{key}</dt>
+                <dd>
+                  {Array.isArray(value)
+                    ? value.map((v, i) => (
+                        <>
+                          {i > 0 && <span class="c-soft"> · </span>}
+                          {v}
+                        </>
+                      ))
+                    : value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+        <div class="swatches" aria-hidden="true">
+          {swatches.map((s) => (
+            <span style={`background:var(${s})`}></span>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <Prompt cmd="cat principles.md" class="gap-xl" />
+    <p class="thesis t-lead">
+      I’m drawn to systems with a rule that <b class="c-accent">must never break</b>, and I like proving those rules
+      hold.
+    </p>
+    <ul class="panels">
+      {principles.map((p, i) => (
+        <li class:list={['panel', { first: i === 0 }]}>
+          <p class="legend t-label">[{i + 1}] principle</p>
+          <h3 class="t-body b">{p.title}</h3>
+          <p class="t-small c-soft">{p.body}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .neofetch {
+    display: flex;
+    align-items: center;
+    gap: 72px;
+  }
+  /* 96 columns of 7px JetBrains Mono (403px), shrinking on narrow screens. Ligatures
+     would join runs like "==" and "--" and smear the shading. */
+  .portrait {
+    display: block;
+    flex: none;
+    width: min(403px, 100%);
+    height: auto;
+    font-feature-settings:
+      'calt' 0,
+      'liga' 0;
+  }
+  .info {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 8ch minmax(0, 1fr);
+  }
+  .swatches {
+    display: flex;
+  }
+  .swatches span {
+    width: 44px;
+    height: 22px;
+  }
+  .pad > :global(.gap-xl) {
+    margin-top: 56px;
+  }
+  .thesis {
+    max-width: 1100px;
+    margin-top: 16px;
+  }
+  .panels {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: 36px;
+  }
+  .panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 28px 24px 24px;
+    border: 1px solid var(--rule);
+  }
+  .panel.first {
+    border-color: var(--accent);
+  }
+  .legend {
+    position: absolute;
+    top: -9px;
+    left: 18px;
+    padding: 0 6px;
+    background: var(--paper);
+    color: var(--ink-soft);
+  }
+  .first .legend {
+    color: var(--accent);
+  }
+
+  @media (max-width: 1079px) {
+    .neofetch {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 24px;
+    }
+    .panels {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+    }
+  }
+
+  @media (max-width: 719px) {
+    .swatches span {
+      width: 36px;
+      height: 18px;
+    }
+    .pad > :global(.gap-xl) {
+      margin-top: 40px;
+    }
+    .thesis {
+      margin-top: 14px;
+    }
+    .panels {
+      margin-top: 28px;
+    }
+    .panel {
+      gap: 8px;
+      padding: 26px 18px 20px;
+    }
+  }
+</style>

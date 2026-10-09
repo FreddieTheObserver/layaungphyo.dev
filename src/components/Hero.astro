@@ -1,0 +1,171 @@
+---
+import { site } from '../data/site';
+import { bannerSvg } from '../lib/ascii';
+import { nb } from '../lib/text';
+import Keycap from './Keycap.astro';
+import Prompt from './Prompt.astro';
+import SiteMap from './SiteMap.astro';
+
+const banner = bannerSvg();
+---
+
+<section id="home" class="sec hero" tabindex="-1" aria-label="intro">
+  <div class="grid wrap">
+    <div class="shell">
+      <Prompt cmd="whoami" />
+      <svg class="banner" viewBox={banner.viewBox} aria-hidden="true" set:html={banner.inner} />
+      <h1 class="who t-body m-small c-soft">{[site.name, site.role, site.location].join(nb('  ·  '))}</h1>
+      <Prompt cmd="cat about.txt" class="gap-l" />
+      <p class="about t-lead">
+        I build backend systems that stay <b class="c-accent">calm</b> under load: no double bookings, no missed alerts,
+        no guessed indexes. Computer science student at KMUTT. Mostly Go and Postgres, on Linux, from a terminal.
+      </p>
+      <Prompt class="gap-l">
+        <span class="cursor" aria-hidden="true"></span>
+      </Prompt>
+      <ul class="keys" aria-label="shortcuts">
+        <li>
+          <a href="#work">
+            <Keycap primary aria-hidden="true">
+              ↵
+            </Keycap>
+            <span class="t-small">selected work</span>
+          </a>
+        </li>
+        <li>
+          <a href={site.github.url} target="_blank" rel="noopener">
+            <Keycap aria-hidden="true">g</Keycap>
+            <span class="t-small c-soft">github</span>
+          </a>
+        </li>
+        <li>
+          <a href={site.resume.url!} target="_blank" rel="noopener">
+            <Keycap aria-hidden="true">r</Keycap>
+            <span class="t-small c-soft">résumé</span>
+          </a>
+        </li>
+        <li class="d-only">
+          <button type="button" data-palette-open aria-haspopup="dialog" aria-controls="palette">
+            <Keycap data-modkey aria-hidden="true">
+              ⌘K
+            </Keycap>
+            <span class="t-small c-soft">command palette</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+    <div class="divider" aria-hidden="true"></div>
+    <SiteMap />
+  </div>
+</section>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 1px 440px;
+  }
+  .divider {
+    background: var(--accent);
+  }
+  .shell {
+    padding: 44px var(--gutter) 56px;
+  }
+  /* 857px is the design width (51 columns of 28px JetBrains Mono); shrink with the pane. */
+  .banner {
+    display: block;
+    width: min(857px, 100%);
+    height: auto;
+    margin-top: 24px;
+  }
+  .banner :global(.blocks) {
+    fill: var(--ink);
+  }
+  .banner :global(.shadow) {
+    fill: none;
+    stroke: var(--heading);
+    stroke-width: 6.5;
+    stroke-linecap: square;
+  }
+  .who {
+    margin-top: 18px;
+    font-weight: 400;
+  }
+  /* Prompt is a child component, so its root only matches through :global. */
+  .shell > :global(.gap-l) {
+    margin-top: 40px;
+  }
+  .about {
+    margin-top: 12px;
+    max-width: 860px;
+  }
+  .cursor {
+    display: inline-block;
+    width: 9px;
+    height: 18px;
+    background: var(--accent-fill);
+    vertical-align: -3px;
+  }
+  .keys {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 28px;
+    margin-top: 44px;
+  }
+  .keys a,
+  .keys button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .keys a:hover span,
+  .keys button:hover span {
+    color: var(--accent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .cursor {
+      animation: blink 1.1s steps(1) infinite;
+    }
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 1079px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .divider {
+      height: 1px;
+      background: var(--rule);
+    }
+  }
+
+  @media (max-width: 719px) {
+    .shell {
+      padding: 28px var(--gutter) 36px;
+    }
+    .banner {
+      margin-top: 16px;
+    }
+    .who {
+      margin-top: 12px;
+    }
+    .shell > :global(.gap-l) {
+      margin-top: 28px;
+    }
+    .about {
+      margin-top: 8px;
+    }
+    .cursor {
+      width: 8px;
+      height: 16px;
+    }
+    .keys {
+      gap: 12px 20px;
+      margin-top: 32px;
+    }
+  }
+</style>

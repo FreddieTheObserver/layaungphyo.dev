@@ -1,0 +1,39 @@
+---
+import { getCollection } from 'astro:content';
+import Prompt from './Prompt.astro';
+import WorkItem from './WorkItem.astro';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<section id="work" class="sec" tabindex="-1" aria-labelledby="work-title">
+  <div class="wrap pad">
+    <Prompt cmd="ls projects/ --long" />
+    <div class="heading">
+      <h2 id="work-title" class="t-h2">
+        <span class="c-heading">##</span> selected work
+      </h2>
+      <p class="t-small m-label c-soft">{projects.length} items · 2026</p>
+    </div>
+    <div class="accordion" data-accordion>
+      {projects.map((p, i) => (
+        <WorkItem entry={p} index={i + 1} />
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .heading {
+    margin-bottom: 36px;
+  }
+  .accordion {
+    border-top: 1px solid var(--rule);
+  }
+
+  @media (max-width: 719px) {
+    .heading {
+      margin-bottom: 28px;
+    }
+  }
+</style>

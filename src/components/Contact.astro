@@ -1,0 +1,177 @@
+---
+import { site } from '../data/site';
+import { nb } from '../lib/text';
+import Prompt from './Prompt.astro';
+
+const year = new Date().getFullYear();
+---
+
+<section id="contact" class="sec" tabindex="-1" aria-labelledby="contact-title">
+  <div class="wrap contact">
+    <Prompt cmd="./contact.sh" />
+    <h2 id="contact-title" class="headline t-display">let’s build something<br /><span class="c-heading">dependable.</span><span class="block" aria-hidden="true"></span></h2>
+
+    <dl class="links t-lead">
+      <div>
+        <dt class="c-soft">mail</dt>
+        <dd>
+          <a class="u" href={`mailto:${site.email}`}>
+            {site.email}
+          </a>
+        </dd>
+      </div>
+      <div>
+        <dt class="c-soft">github</dt>
+        <dd>
+          <a class="u" href={site.github.url} target="_blank" rel="noopener"><span class="d-only">github.com/</span>{site.github.handle}</a>
+        </dd>
+      </div>
+      <div>
+        <dt class="c-soft">linkedin</dt>
+        <dd>
+          {site.linkedin.url ? (
+            <a class="u" href={site.linkedin.url} target="_blank" rel="noopener">
+              {site.linkedin.label}
+            </a>
+          ) : (
+            <span class="c-soft">{site.linkedin.label}</span>
+          )}
+        </dd>
+      </div>
+      <div>
+        <dt class="c-soft">resume</dt>
+        <dd>
+          <a class="u" href={site.resume.url} target="_blank" rel="noopener">
+            {site.resume.label}
+          </a>
+        </dd>
+      </div>
+    </dl>
+
+    <pre class="tilde t-body m-small c-soft" aria-hidden="true">~
+~
+~</pre>
+
+    <footer class="statusline">
+      <div class="left">
+        <span class="mode t-key">NORMAL</span>
+        <span class="t-small">
+          <span class="d-only">{site.dir}/</span>index.md
+        </span>
+      </div>
+      <p class="colophon t-small m-label c-soft">{`© ${year} freddie (la yaung phyo)`}<span class="d-only">{nb('  │  ')}</span><span class="m-only"> · </span>set in jetbrains mono<span class="d-only">{nb('  │  utf-8')}</span></p>
+      <a class="top t-small c-accent" href="#home" data-top>
+        gg ↑ top
+      </a>
+    </footer>
+  </div>
+</section>
+
+<style>
+  .contact {
+    padding: 96px var(--gutter) 40px;
+  }
+  .headline {
+    margin-top: 28px;
+  }
+  .block {
+    display: inline-block;
+    width: 0.6em;
+    height: 1em;
+    margin-left: 0.05em;
+    background: var(--heading);
+    vertical-align: -0.12em;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .block {
+      animation: blink 1.1s steps(1) infinite;
+    }
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  .links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 44px;
+  }
+  .links div {
+    display: flex;
+  }
+  .links dt {
+    flex: none;
+    width: 140px;
+  }
+  .links a:hover {
+    color: var(--accent);
+  }
+  .tilde {
+    margin-top: 56px;
+  }
+  .statusline {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 24px;
+    background: var(--paper-sunk);
+  }
+  .left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-right: auto;
+  }
+  .mode {
+    padding: 6px 12px;
+    background: var(--accent-fill);
+    color: var(--on-accent-fill);
+  }
+  .top {
+    padding-right: 12px;
+  }
+  .top:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  @media (max-width: 719px) {
+    .contact {
+      padding: 56px var(--gutter) 0;
+    }
+    .headline {
+      margin-top: 20px;
+    }
+    .links {
+      margin-top: 32px;
+    }
+    .links dt {
+      width: 96px;
+    }
+    .tilde {
+      margin-top: 36px;
+    }
+    .statusline {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-areas:
+        'left top'
+        'colophon colophon';
+      gap: 0;
+      margin: 20px calc(-1 * var(--gutter)) 0;
+    }
+    .left {
+      grid-area: left;
+      gap: 10px;
+    }
+    .top {
+      grid-area: top;
+    }
+    .colophon {
+      grid-area: colophon;
+      padding: 8px 10px 10px;
+    }
+  }
+</style>

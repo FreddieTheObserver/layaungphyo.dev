@@ -1,0 +1,25 @@
+---
+import About from '../components/About.astro';
+import CommandPalette from '../components/CommandPalette.astro';
+import Contact from '../components/Contact.astro';
+import Hero from '../components/Hero.astro';
+import Now from '../components/Now.astro';
+import TmuxBar from '../components/TmuxBar.astro';
+import Work from '../components/Work.astro';
+import Base from '../layouts/Base.astro';
+---
+
+<Base>
+  <a class="skip t-small" href="#work">
+    skip to selected work
+  </a>
+  <TmuxBar />
+  <main>
+    <Hero />
+    <Work />
+    <About />
+    <Now />
+    <Contact />
+  </main>
+  <CommandPalette />
+</Base>

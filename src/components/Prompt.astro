@@ -1,0 +1,13 @@
+---
+import { site } from '../data/site';
+
+interface Props {
+  cmd?: string;
+  class?: string;
+}
+
+// The markup stays on one line: whitespace between these spans is rendered.
+const { cmd = '', class: cls } = Astro.props;
+---
+
+<p class:list={['prompt t-body m-small', cls]}><span class="c-user">{`${site.user}@${site.host}`}</span> <span class="c-path"><span class="d-only">{site.dir}</span><span class="m-only">~</span></span> <span class="c-soft">$</span> {cmd}<slot /></p>

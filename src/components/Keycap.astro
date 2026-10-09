@@ -1,0 +1,40 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'kbd'> {
+  primary?: boolean;
+  size?: 'md' | 'sm';
+}
+
+const { primary = false, size = 'md', class: cls, ...rest } = Astro.props;
+---
+
+<kbd class:list={['cap t-key', size, { primary }, cls]} {...rest}>
+  <slot />
+</kbd>
+
+<style>
+  .cap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--ink-soft);
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .md {
+    min-width: 25px;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  .sm {
+    min-width: 22px;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+  .primary {
+    background: var(--accent-fill);
+    border-color: var(--accent-fill);
+    color: var(--on-accent-fill);
+  }
+</style>

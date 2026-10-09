@@ -1,0 +1,38 @@
+---
+import { statusTone, type Status } from '../lib/status';
+
+interface Props {
+  status: Status;
+}
+
+const { status } = Astro.props;
+// Drawn in CSS: ◐ is missing from JetBrains Mono and its fallback renders at the wrong size.
+const dot = status === 'live' ? 'full' : status === 'in progress' ? 'half' : 'empty';
+---
+
+<span class:list={['status', statusTone(status)]}>
+  <span class:list={['dot', dot]} aria-hidden="true"></span>
+  {status}
+</span>
+
+<style>
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    white-space: nowrap;
+  }
+  .dot {
+    flex: none;
+    width: 0.62em;
+    height: 0.62em;
+    border: 1px solid currentColor;
+    border-radius: 50%;
+  }
+  .full {
+    background: currentColor;
+  }
+  .half {
+    background: linear-gradient(90deg, currentColor 50%, transparent 50%);
+  }
+</style>

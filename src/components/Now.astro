@@ -1,0 +1,32 @@
+---
+import { now } from '../data/now';
+import GitLog from './GitLog.astro';
+import Heatmap from './Heatmap.astro';
+import Prompt from './Prompt.astro';
+---
+
+<section id="now" class="sec" tabindex="-1" aria-labelledby="now-title">
+  <div class="wrap pad">
+    <Prompt cmd="git log --graph --oneline -4" />
+    <div class="heading">
+      <h2 id="now-title" class="t-h2">
+        <span class="c-heading">##</span> now
+      </h2>
+      <p class="t-small m-label c-soft">updated {now.updated}</p>
+    </div>
+    <Heatmap />
+    <GitLog class="log-gap" />
+  </div>
+</section>
+
+<style>
+  .pad > :global(.log-gap) {
+    margin-top: 40px;
+  }
+
+  @media (max-width: 719px) {
+    .pad > :global(.log-gap) {
+      margin-top: 28px;
+    }
+  }
+</style>

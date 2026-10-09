@@ -1,0 +1,138 @@
+---
+import { getCollection } from 'astro:content';
+import { site } from '../data/site';
+import type { Status as ProjectStatus } from '../lib/status';
+import { nb } from '../lib/text';
+import Keycap from './Keycap.astro';
+import Status from './Status.astro';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+
+interface Row {
+  branch: string;
+  name: string;
+  tone: string;
+  href: string;
+  key?: string;
+  status?: ProjectStatus;
+  selected?: boolean;
+  external?: boolean;
+}
+
+const rows: Row[] = [
+  { branch: '├── ', name: 'work/', tone: 'c-key', href: '#work', key: '1', selected: true },
+  ...projects.map((p, i) => ({
+    branch: i < projects.length - 1 ? '│   ├── ' : '│   └── ',
+    name: `${p.data.name}/`,
+    tone: 'c-key',
+    href: `#project-${p.id}`,
+    status: p.data.status,
+  })),
+  { branch: '├── ', name: 'about.md', tone: 'c-ink', href: '#about', key: '2' },
+  { branch: '├── ', name: 'now.md', tone: 'c-ink', href: '#now', key: '3' },
+  { branch: '├── ', name: 'contact.sh', tone: 'c-ok', href: '#contact', key: '4' },
+  { branch: '└── ', name: 'résumé.pdf', tone: 'c-ink', href: site.resume.url!, key: 'r', external: true },
+];
+const directories = 1 + projects.length;
+const files = rows.length - directories;
+---
+
+<nav class="sitemap" aria-labelledby="sitemap-title" data-sitemap>
+  <p id="sitemap-title" class="t-label">
+    <span class="c-path">
+      <span class="d-only">{site.dir}</span>
+      <span class="m-only">~</span>
+    </span>
+    $ tree -L 2
+  </p>
+  <ul class="tree t-small">
+    <li class="root c-soft" aria-hidden="true">
+      {site.dir}
+    </li>
+    {rows.map((r) => (
+      <li>
+        <a
+          class:list={['row', { selected: r.selected }]}
+          href={r.href}
+          target={r.external ? '_blank' : undefined}
+          rel={r.external ? 'noopener' : undefined}
+        >
+          {/* No-break spaces: a trailing normal space would be trimmed at the end of the flex item. */}
+          <span class="c-dim" aria-hidden="true">{r.branch.replaceAll(' ', ' ')}</span>
+          <span class:list={['name', r.tone, { b: r.selected }]}>{r.name}</span>
+          <span class="fill"></span>
+          {r.status && (
+            <span class="t-label">
+              <Status status={r.status} />
+            </span>
+          )}
+          {r.key && (
+            <Keycap size="sm" primary={r.selected} class="d-only" aria-hidden="true">
+              {r.key}
+            </Keycap>
+          )}
+          {r.key && (
+            <span class:list={['m-only', r.selected ? 'c-accent' : 'c-soft']} aria-hidden="true">
+              ›
+            </span>
+          )}
+        </a>
+      </li>
+    ))}
+  </ul>
+  <p class="t-label c-soft">
+    {directories} directories, {files} files
+  </p>
+  <p class="hint t-label c-soft">
+    <span class="d-only">{nb('↑↓ move   ↵ open   / filter')}</span>
+    <span class="m-only">tap a line to jump there</span>
+  </p>
+</nav>
+
+<style>
+  .sitemap {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 20px 24px 22px;
+    background: var(--paper-sunk);
+  }
+  .tree {
+    display: flex;
+    flex-direction: column;
+  }
+  .root,
+  .row {
+    padding: 6px 10px;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border-radius: 4px;
+    color: var(--ink);
+  }
+  .row:hover,
+  .row:focus-visible,
+  .row.selected {
+    background: var(--card);
+  }
+  .row:hover .name {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .fill {
+    flex: 1;
+    min-width: 12px;
+  }
+  .hint {
+    margin-top: auto;
+  }
+
+  @media (max-width: 719px) {
+    .sitemap {
+      gap: 12px;
+      padding: 18px var(--gutter) 22px;
+    }
+  }
+</style>

@@ -1,0 +1,39 @@
+/* From the Figma "Color" collection, mode "Terminal Latte". Accent and ok are a
+   shade deeper than Figma's #8839ef / #2f7d1f so small text keeps 4.5:1 on the
+   tinted panels (paper-sunk, card), not just on paper. */
+:root {
+  --paper: #eff1f5;
+  --paper-sunk: #e6e9ef;
+  --card: #dce0e8;
+  --ink: #4c4f69;
+  --ink-soft: #5c5f77;
+  --rule: #ccd0da;
+  --accent: #7c2fe0;
+  --accent-strong: #7c2fe0;
+  --on-ink: #eff1f5;
+  --on-ink-soft: #9ca0b0;
+  --ok: #2a7019;
+  --heat-1: #c3aeea;
+  --heat-2: #ae84ec;
+  --heat-3: #9a5eed;
+
+  /* Role tokens alias the base palette, as they do in Figma. */
+  --prompt-user: var(--ok);
+  --prompt-path: var(--accent);
+  --heading: var(--accent);
+  --key: var(--accent);
+  --accent-fill: var(--accent);
+  --on-accent-fill: var(--on-ink);
+
+  --shadow-rgb: 22 19 15;
+
+  --tmux-h: 34px;
+  --gutter: 56px;
+}
+
+@media (max-width: 719px) {
+  :root {
+    --tmux-h: 40px;
+    --gutter: 20px;
+  }
+}

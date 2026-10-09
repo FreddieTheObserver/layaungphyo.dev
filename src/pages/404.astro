@@ -1,0 +1,34 @@
+---
+import Prompt from '../components/Prompt.astro';
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="404 · layaungphyo.dev" noindex>
+  <main class="wrap pad lost">
+    <Prompt cmd="cd">
+      <span data-missing-path>this-page</span>
+    </Prompt>
+    <p class="t-body c-soft">cd: no such file or directory</p>
+    <h1 class="t-h2">
+      <span class="c-heading">##</span> 404
+    </h1>
+    <p class="t-body">
+      <a class="c-accent u" href="/">
+        ← cd ~
+      </a>
+    </p>
+  </main>
+  <script>
+    const el = document.querySelector('[data-missing-path]');
+    if (el) el.textContent = location.pathname;
+  </script>
+</Base>
+
+<style>
+  .lost {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 100vh;
+  }
+</style>

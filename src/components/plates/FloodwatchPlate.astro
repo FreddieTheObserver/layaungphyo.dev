@@ -1,0 +1,127 @@
+---
+import './plate.css';
+
+const at = (x: number, y: number, w?: number) => `--x:${x};--y:${y}${w ? `;--w:${w}` : ''}`;
+
+// Observed level (origin 64,128.2) and six-hour forecast (origin 472,107.7), from the Figma plate.
+const observed =
+  'M0 78.49L5.67 83.29L11.33 87.72L17 91.7L22.67 95.15L28.33 98.02L34 100.25L39.67 101.8L45.33 102.63L51 102.74L56.67 102.11L62.33 100.73L68 98.64L73.67 95.85L79.33 92.41L85 88.36L90.67 83.76L96.33 78.68L102 73.19L107.67 67.37L113.33 61.32L119 55.11L124.67 48.85L130.33 42.63L136 36.54L141.67 30.67L147.33 25.1L153 19.93L158.67 15.23L164.33 11.07L170 7.5L175.67 4.58L181.33 2.34L187 0.83L192.67 0.04L198.33 0L204 0.69L209.67 2.1L215.33 4.2L221 6.94L226.67 10.28L232.33 14.16L238 18.5L243.67 23.24L249.33 28.29L255 33.55L260.67 38.95L266.33 44.39L272 49.77L277.67 55L283.33 59.99L289 64.65L294.67 68.91L300.33 72.69L306 75.91L311.67 78.53L317.33 80.49L323 81.76L328.67 82.31L334.33 82.11L340 81.18L345.67 79.52L351.33 77.15L357 74.09L362.67 70.4L368.33 66.12L374 61.32L379.67 56.07L385.33 50.44L391 44.51L396.67 38.39L402.33 32.15L408 25.89';
+const forecast =
+  'M0 46.42L5.67 40.23L11.33 34.22L17 28.46L22.67 23.05L28.33 18.06L34 13.56L39.67 9.63L45.33 6.31L51 3.66L56.67 1.71L62.33 0.49L68 0L73.67 0.25L79.33 1.23L85 2.92L90.67 5.28L96.33 8.27L102 11.84L107.67 15.91L113.33 20.42L119 25.29L124.67 30.44L130.33 35.77L136 41.19';
+
+const label =
+  'Water level at Chao Phraya gauge 15: rising to 1.36 m at 18:00, forecast to peak at 1.78 m around 21:05, 7 cm below the 1.85 m bank. Beside it, the Telegram alert floodwatch sends for that forecast.';
+---
+
+<figure class="pl-box" role="img" aria-label={label}>
+  <div class="pl" aria-hidden="true">
+    <svg viewBox="0 0 636 460">
+      <g class="s-rule" stroke-width="1" stroke-dasharray="2 4">
+        <line x1="64" y1="139" x2="608" y2="139"></line>
+        <line x1="64" y1="194" x2="608" y2="194"></line>
+        <line x1="64" y1="249" x2="608" y2="249"></line>
+      </g>
+      <line class="s-accent" x1="64" y1="100.5" x2="608" y2="100.5" stroke-width="1" stroke-dasharray="6 4"></line>
+      <line class="s-soft" x1="472" y1="108" x2="472" y2="258" stroke-width="1" stroke-dasharray="2 3"></line>
+      <path
+        class="s-ink f-none"
+        transform="translate(64 128.2)"
+        d={observed}
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+      <path
+        class="s-accent f-none"
+        transform="translate(472 107.7)"
+        d={forecast}
+        stroke-width="2"
+        stroke-dasharray="5 5"
+        stroke-linecap="round"
+      ></path>
+      <circle class="f-ink s-sunk" cx="472" cy="154.1" r="4" stroke-width="2"></circle>
+      <circle class="f-sunk s-accent" cx="541.1" cy="107.7" r="4" stroke-width="2"></circle>
+      <rect class="f-ink" x="416" y="35" width="16" height="2"></rect>
+      <rect class="f-accent" x="521" y="35" width="16" height="2"></rect>
+    </svg>
+
+    <span class="pl-t pl-cap" style={at(28, 28)}>
+      Fig. 01 · Chao Phraya 15, water level (m)
+    </span>
+    <span class="pl-t pl-cap" style={at(440, 28)}>
+      Observed
+    </span>
+    <span class="pl-t pl-cap" style={at(545, 28)}>
+      Forecast
+    </span>
+
+    <span class="pl-t pl-cap c-strong" style={at(28, 92.5)}>
+      1.85
+    </span>
+    <span class="pl-t pl-cap" style={at(28, 131)}>
+      1.5
+    </span>
+    <span class="pl-t pl-cap" style={at(28, 186)}>
+      1.0
+    </span>
+    <span class="pl-t pl-cap" style={at(28, 241)}>
+      0.5
+    </span>
+    <span class="pl-t pl-cap c-strong" style={at(377.1, 78.5)}>
+      Peak 1.78 m · 21:05
+    </span>
+    <span class="pl-t pl-cap c-strong" style={at(577, 78.5)}>
+      Bank
+    </span>
+
+    <span class="pl-t pl-cap" style={at(64, 270)}>
+      00:00
+    </span>
+    <span class="pl-t pl-cap" style={at(180.5, 270)}>
+      06:00
+    </span>
+    <span class="pl-t pl-cap" style={at(316.5, 270)}>
+      12:00
+    </span>
+    <span class="pl-t pl-cap c-ink" style={at(436.5, 270)}>
+      Now 18:00
+    </span>
+    <span class="pl-t pl-cap c-strong" style={at(577, 270)}>
+      +6 h
+    </span>
+
+    <div class="pl-card" style={`${at(28, 312, 372)};--gap:8`}>
+      <div class="pl-row">
+        <span class="sender pl-mono">
+          <span class="avatar"></span>floodwatch_bkk_bot
+        </span>
+        <span class="pl-mono c-soft">18:02</span>
+      </div>
+      <p class="pl-sans">
+        <span class="watch c-strong">WATCH</span> · Chao Phraya 15 is at 1.36 m and rising. Tide forecast: peak 1.78 m
+        around 21:05, 7 cm below the bank.
+      </p>
+    </div>
+
+    <p class="pl-t pl-wrap pl-cap" style={at(424, 316, 184)}>
+      Backtest, 26-27 Sep: 6 h peak within <span class="c-strong">8 cm</span> on average, vs 45 cm for “no change”.
+    </p>
+  </div>
+</figure>
+
+<style>
+  .sender {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--u) * 8);
+  }
+  .avatar {
+    width: calc(var(--u) * 18);
+    height: calc(var(--u) * 18);
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .watch {
+    font-weight: 500;
+  }
+</style>

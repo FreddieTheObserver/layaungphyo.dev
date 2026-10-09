@@ -1,0 +1,105 @@
+/* Plates are drawn on a 636x460 design grid. --u is one design pixel at the
+   current width, so text, strokes and spacing scale together like the Figma frame. */
+.pl-box {
+  container-type: inline-size;
+}
+
+.pl {
+  --u: calc(100cqw / 636);
+  position: relative;
+  aspect-ratio: 636 / 460;
+  overflow: hidden;
+  border-radius: calc(var(--u) * 4);
+  background: var(--paper-sunk);
+  color: var(--ink);
+}
+
+.pl > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.pl-t {
+  position: absolute;
+  left: calc(var(--u) * var(--x));
+  top: calc(var(--u) * var(--y));
+  white-space: nowrap;
+}
+
+.pl-wrap {
+  width: calc(var(--u) * var(--w));
+  white-space: normal;
+}
+
+.pl-cap {
+  font: 400 calc(var(--u) * 12) / calc(var(--u) * 16) var(--font-geist-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.pl-mono {
+  font: 400 calc(var(--u) * 13) / calc(var(--u) * 20) var(--font-geist-mono);
+}
+
+.pl-sans {
+  font: 400 calc(var(--u) * 14) / calc(var(--u) * 20) var(--font-geist);
+}
+
+.pl-card {
+  position: absolute;
+  left: calc(var(--u) * var(--x));
+  top: calc(var(--u) * var(--y));
+  width: calc(var(--u) * var(--w));
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * var(--gap));
+  padding: calc(var(--u) * 14) calc(var(--u) * 16) calc(var(--u) * 16);
+  border: calc(var(--u) * 1) solid var(--rule);
+  border-radius: calc(var(--u) * 14);
+  background: var(--card);
+  box-shadow:
+    0 calc(var(--u) * 1) calc(var(--u) * 2) rgb(var(--shadow-rgb) / 0.06),
+    0 calc(var(--u) * 16) calc(var(--u) * 40) calc(var(--u) * -8) rgb(var(--shadow-rgb) / 0.1);
+}
+
+.pl-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pl-pre {
+  white-space: pre;
+}
+
+.s-rule {
+  stroke: var(--rule);
+}
+.s-ink {
+  stroke: var(--ink);
+}
+.s-soft {
+  stroke: var(--ink-soft);
+}
+.s-accent {
+  stroke: var(--accent);
+}
+.s-sunk {
+  stroke: var(--paper-sunk);
+}
+.f-ink {
+  fill: var(--ink);
+}
+.f-accent {
+  fill: var(--accent);
+}
+.f-sunk {
+  fill: var(--paper-sunk);
+}
+.f-none {
+  fill: none;
+}

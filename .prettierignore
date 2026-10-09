@@ -1,0 +1,12 @@
+dist
+.astro
+node_modules
+pnpm-lock.yaml
+test-results
+playwright-report
+src/data/portrait.txt
+src/data/contributions.json
+src/assets/fonts
+
+# Templates are whitespace-sensitive (terminal spacing); the Astro plugin ignores htmlWhitespaceSensitivity.
+*.astro

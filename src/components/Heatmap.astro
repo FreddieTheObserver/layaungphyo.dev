@@ -1,0 +1,194 @@
+---
+import data from '../data/contributions.json';
+import { site } from '../data/site';
+import { layout, type Day } from '../lib/heatmap';
+
+const weeks = data.weeks as Day[][];
+const desk = layout(weeks, { cell: 19, gap: 4, labelCol: 36, monthRow: 22 });
+const mob = layout(weeks.slice(-26), { cell: 10, gap: 2, labelCol: 0, monthRow: 18 });
+const fmt = (n: number) => n.toLocaleString('en-US');
+const levels = [0, 1, 2, 3, 4];
+---
+
+<figure class="heat">
+  <div class="cap-row">
+    <figcaption class="cap">
+      <span class="wide">Fig. 03 · GitHub contributions, last 12 months</span>
+      <span class="narrow">Fig. 03 · contributions, 26 weeks</span>
+    </figcaption>
+    <span class="legend wide" aria-hidden="true">
+      less{' '}
+      <span class="lv">
+        {levels.map((l) => (
+          <span class={`l${l}`}></span>
+        ))}
+      </span>{' '}
+      more
+    </span>
+  </div>
+
+  <svg
+    class="grid wide"
+    viewBox={`0 0 ${desk.width} ${desk.height}`}
+    role="img"
+    aria-label={`${fmt(data.total)} GitHub contributions in the last year`}
+  >
+    {desk.months.map((m) => (
+      <text class="lbl" x={m.x} y="11">
+        {m.label}
+      </text>
+    ))}
+    {desk.days.map((d) => (
+      <text class="lbl" x="0" y={d.y} dominant-baseline="central">
+        {d.label}
+      </text>
+    ))}
+    {desk.cells.map((c) => (
+      <rect class={`l${c.level}`} x={c.x} y={c.y} width="19" height="19" rx="3">
+        <title>{c.title}</title>
+      </rect>
+    ))}
+  </svg>
+
+  <svg
+    class="grid narrow"
+    viewBox={`0 0 ${mob.width} ${mob.height}`}
+    role="img"
+    aria-label={`${fmt(mob.total)} GitHub contributions in the last 26 weeks`}
+  >
+    {mob.months.map((m) => (
+      <text class="lbl sm" x={m.x} y="10">
+        {m.label}
+      </text>
+    ))}
+    {mob.cells.map((c) => (
+      <rect class={`l${c.level}`} x={c.x} y={c.y} width="10" height="10" rx="2"></rect>
+    ))}
+  </svg>
+
+  <div class="total-row">
+    <p class="t-small wide">
+      <span class="c-accent">{fmt(data.total)}</span> contributions in the last year
+    </p>
+    <a class="t-small c-soft wide" href={site.github.url} target="_blank" rel="noopener">
+      github.com/{site.github.handle}
+    </a>
+    <p class="t-label narrow">
+      <span class="c-accent">{fmt(mob.total)}</span> contributions
+    </p>
+    <span class="legend sm narrow" aria-hidden="true">
+      less{' '}
+      <span class="lv">
+        {levels.map((l) => (
+          <span class={`l${l}`}></span>
+        ))}
+      </span>{' '}
+      more
+    </span>
+  </div>
+</figure>
+
+<style>
+  .heat {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 28px;
+    border-radius: 4px;
+    background: var(--paper-sunk);
+  }
+  .cap-row,
+  .total-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .cap,
+  .legend {
+    font: 400 12px/16px var(--font-geist-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .legend {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: lowercase;
+  }
+  .lv {
+    display: flex;
+    gap: 3px;
+  }
+  .lv span {
+    width: 11px;
+    height: 11px;
+    border-radius: 2px;
+  }
+  .legend.sm .lv {
+    gap: 2px;
+  }
+  .legend.sm .lv span {
+    width: 9px;
+    height: 9px;
+  }
+  .grid {
+    width: 100%;
+    height: auto;
+  }
+  .lbl {
+    font: 400 11px var(--font-geist-mono);
+    fill: var(--ink-soft);
+  }
+  .lbl.sm {
+    font-size: 10px;
+  }
+  .l0 {
+    fill: var(--card);
+    background: var(--card);
+  }
+  .l1 {
+    fill: var(--heat-1);
+    background: var(--heat-1);
+  }
+  .l2 {
+    fill: var(--heat-2);
+    background: var(--heat-2);
+  }
+  .l3 {
+    fill: var(--heat-3);
+    background: var(--heat-3);
+  }
+  .l4 {
+    fill: var(--accent);
+    background: var(--accent);
+  }
+  a:hover {
+    color: var(--accent);
+  }
+
+  .narrow {
+    display: none;
+  }
+
+  @media (max-width: 1079px) {
+    .wide {
+      display: none;
+    }
+    .narrow {
+      display: revert;
+    }
+    .legend.narrow {
+      display: flex;
+    }
+    .grid.narrow {
+      display: block;
+      max-width: 640px;
+    }
+    .heat {
+      gap: 14px;
+      padding: 16px;
+    }
+  }
+</style>

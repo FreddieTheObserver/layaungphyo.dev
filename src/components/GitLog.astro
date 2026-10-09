@@ -1,0 +1,190 @@
+---
+import { createHash } from 'node:crypto';
+import { now } from '../data/now';
+
+interface Props {
+  class?: string;
+}
+
+const { entries, branch } = now;
+const last = entries.length - 1;
+// Short hashes derived from the entry text, so they stay stable between builds.
+const rows = entries.map((e, i) => ({
+  ...e,
+  hash: createHash('sha1').update(e.text).digest('hex').slice(0, 7),
+  top: i > 0,
+  bottom: i < last,
+  out: i === branch.from,
+  into: i === branch.to,
+  through: i > branch.from && i < branch.to,
+  beforeMerge: i === branch.to - 1 && i > branch.from,
+}));
+---
+
+<ol class:list={['log', Astro.props.class]} aria-label="recent activity">
+  {rows.map((r, i) => (
+    <li class:list={['commit', r.lane === 'side' ? 'on-side' : 'on-main', { head: i === 0 }]}>
+      <span class="lanes" aria-hidden="true">
+        {r.top && <span class="ln main top" />}
+        {r.bottom && <span class="ln main bottom" />}
+        {r.out && (
+          <svg class="curve out" viewBox="0 0 22 42" preserveAspectRatio="none">
+            <path d="M0 0C0 21 22 21 22 42" vector-effect="non-scaling-stroke" />
+          </svg>
+        )}
+        {r.out && <span class="ln side after-out" />}
+        {r.through && <span class:list={['ln side through', { 'before-merge': r.beforeMerge }]} />}
+        {r.into && (
+          <svg class="curve in" viewBox="0 0 22 42" preserveAspectRatio="none">
+            <path d="M22 0C22 21 0 21 0 42" vector-effect="non-scaling-stroke" />
+          </svg>
+        )}
+        <span class="dot" />
+      </span>
+      <p class="line">
+        <span class="meta">
+          <span class="c-accent">{r.hash}</span>
+          {r.refs && <span class="c-ok">({r.refs})</span>}
+          <span class="date-m c-soft">· {r.date}</span>
+        </span>
+        <span class="msg">{r.text}</span>
+      </p>
+      <span class="date t-small c-soft">{r.date}</span>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .log {
+    --gw: 40px;
+    --main-x: 8px;
+    --side-x: 30px;
+    --dot-y: 15px;
+    --gap: 12px;
+    --curve-h: 42px;
+    --dot: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+  }
+  .commit {
+    display: grid;
+    grid-template-columns: var(--gw) minmax(0, 1fr) auto;
+    column-gap: 16px;
+    align-items: start;
+  }
+  .lanes {
+    position: relative;
+    align-self: stretch;
+  }
+  .ln {
+    position: absolute;
+    width: 2px;
+    transform: translateX(-1px);
+  }
+  .main {
+    left: var(--main-x);
+    background: var(--accent);
+  }
+  .side {
+    left: var(--side-x);
+    background: var(--ok);
+  }
+  .main.top {
+    top: 0;
+    height: var(--dot-y);
+  }
+  .main.bottom {
+    top: var(--dot-y);
+    bottom: calc(-1 * var(--gap));
+  }
+  .after-out {
+    top: calc(var(--dot-y) + var(--curve-h));
+    bottom: calc(-1 * var(--gap));
+  }
+  .through {
+    top: 0;
+    bottom: calc(-1 * var(--gap));
+  }
+  /* Stop where the merge curve in the next row begins. */
+  .through.before-merge {
+    bottom: calc(var(--curve-h) - var(--gap) - var(--dot-y));
+  }
+  .curve {
+    position: absolute;
+    left: var(--main-x);
+    width: calc(var(--side-x) - var(--main-x));
+    height: var(--curve-h);
+    overflow: visible;
+    fill: none;
+    stroke: var(--ok);
+    stroke-width: 2;
+  }
+  .curve.out {
+    top: var(--dot-y);
+  }
+  .curve.in {
+    top: calc(var(--dot-y) - var(--curve-h));
+  }
+  .dot {
+    position: absolute;
+    top: calc(var(--dot-y) - var(--dot) / 2);
+    left: calc(var(--main-x) - var(--dot) / 2);
+    width: var(--dot);
+    height: var(--dot);
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    background: var(--paper);
+  }
+  .on-side .dot {
+    left: calc(var(--side-x) - var(--dot) / 2);
+    border-color: var(--ok);
+  }
+  .head .dot {
+    background: var(--accent);
+  }
+  .line {
+    font: 400 18px/30px var(--font-mono);
+    letter-spacing: -0.005em;
+  }
+  .date {
+    padding-top: 5px;
+  }
+  .date-m {
+    display: none;
+  }
+
+  @media (max-width: 1079px) {
+    .log {
+      --gw: 30px;
+      --main-x: 6px;
+      --side-x: 22px;
+      --dot-y: 9px;
+      --gap: 18px;
+      --curve-h: 64px;
+      --dot: 9px;
+    }
+    .commit {
+      grid-template-columns: var(--gw) minmax(0, 1fr);
+      column-gap: 8px;
+    }
+    .line {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      letter-spacing: 0;
+    }
+    .meta {
+      font: 400 12px/18px var(--font-mono);
+    }
+    .msg {
+      font: 400 15px/24px var(--font-mono);
+    }
+    .date {
+      display: none;
+    }
+    .date-m {
+      display: inline;
+    }
+  }
+</style>

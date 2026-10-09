@@ -1,0 +1,195 @@
+---
+import { site } from '../data/site';
+import { nb } from '../lib/text';
+import Keycap from './Keycap.astro';
+
+const commands = [
+  { id: 'work', label: 'go to work', desc: 'selected projects', key: '1', href: '#work' },
+  { id: 'about', label: 'go to about', desc: 'principles and toolbox', key: '2', href: '#about' },
+  { id: 'now', label: 'go to now', desc: 'git log of the month', key: '3', href: '#now' },
+  { id: 'contact', label: 'go to contact', desc: 'mail, github, résumé', key: '4', href: '#contact' },
+  { id: 'github', label: 'open github', desc: site.github.handle, key: 'g', href: site.github.url, external: true },
+  { id: 'resume', label: 'download résumé', desc: 'pdf', key: 'r', href: site.resume.url, external: true },
+];
+---
+
+<dialog id="palette" class="palette" aria-label="command palette">
+  <div class="top m-only">
+    <span class="session t-key">{site.user}</span>
+    <button class="close t-small c-soft" type="button" data-palette-close>
+      <Keycap size="sm" aria-hidden="true">
+        esc
+      </Keycap>
+      close
+    </button>
+  </div>
+  <label class="input">
+    <span class="prompt-char c-accent t-lead" aria-hidden="true">
+      &gt;
+    </span>
+    <input
+      id="palette-input"
+      class="t-lead"
+      type="text"
+      placeholder="go to"
+      autocomplete="off"
+      spellcheck="false"
+      role="combobox"
+      aria-expanded="true"
+      aria-controls="palette-list"
+      aria-autocomplete="list"
+      aria-label="filter commands"
+    />
+  </label>
+  <ul id="palette-list" class="list" role="listbox" aria-label="commands">
+    {commands.map((c, i) => (
+      <li
+        id={`cmd-${c.id}`}
+        class="cmd"
+        role="option"
+        aria-selected={i === 0 ? 'true' : 'false'}
+        data-href={c.href}
+        data-key={c.key}
+        data-external={c.external ? '' : undefined}
+      >
+        <span class="label">
+          <span class="name t-body">{c.label}</span>
+          <span class="desc t-small c-soft">{c.desc}</span>
+        </span>
+        <Keycap size="sm" aria-hidden="true">
+          {c.key}
+        </Keycap>
+      </li>
+    ))}
+  </ul>
+  <p id="palette-empty" class="empty t-small c-soft" hidden>
+    no matching command
+  </p>
+  <p class="foot t-label c-soft d-only">{nb('↑↓ navigate   ↵ open   1-4 jump   esc close')}</p>
+  <div class="foot-m m-only">
+    <p class="t-label c-soft">
+      <span class="c-path">{site.dir}</span> $ ./contact.sh
+    </p>
+    <a class="t-body u" href={`mailto:${site.email}`}>
+      {site.email}
+    </a>
+  </div>
+</dialog>
+
+<style>
+  .palette {
+    width: min(640px, calc(100vw - 32px));
+    margin: 15vh auto auto;
+    padding: 0;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--ink);
+    box-shadow: 0 24px 64px -16px rgb(var(--shadow-rgb) / 0.25);
+  }
+  .palette::backdrop {
+    background: rgb(76 79 105 / 0.2);
+  }
+  .input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px;
+  }
+  input {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: var(--ink);
+    caret-color: var(--accent);
+  }
+  input::placeholder {
+    color: var(--ink-soft);
+  }
+  .list {
+    padding: 8px 0;
+    border-block: 1px solid var(--rule);
+  }
+  .cmd {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 11px 20px;
+    cursor: pointer;
+  }
+  /* display: flex above would otherwise override the hidden attribute. */
+  .cmd[hidden] {
+    display: none;
+  }
+  .cmd[aria-selected='true'] {
+    background: var(--paper-sunk);
+    box-shadow: inset 2px 0 0 var(--accent);
+  }
+  .cmd[aria-selected='true'] .name {
+    color: var(--accent);
+  }
+  .label {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    min-width: 0;
+  }
+  .empty {
+    padding: 16px 20px;
+  }
+  .foot {
+    padding: 12px 20px 14px;
+  }
+
+  @media (max-width: 719px) {
+    .palette[open] {
+      display: flex;
+      flex-direction: column;
+    }
+    .palette {
+      width: 100%;
+      max-width: none;
+      height: 100%;
+      max-height: none;
+      margin: 0;
+      border: 0;
+      border-radius: 0;
+      background: var(--paper);
+    }
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 36px;
+      background: var(--paper-sunk);
+    }
+    .session {
+      padding: 10px 12px;
+      background: var(--accent-fill);
+      color: var(--on-accent-fill);
+    }
+    .close {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px 6px 12px;
+    }
+    .input {
+      margin-top: 12px;
+    }
+    .cmd {
+      padding: 16px 20px;
+    }
+    .foot-m {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: auto;
+      padding: 0 20px 28px;
+    }
+  }
+</style>
