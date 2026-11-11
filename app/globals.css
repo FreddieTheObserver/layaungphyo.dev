@@ -164,7 +164,31 @@
   @apply rounded border bg-muted px-1.5 py-0.5 font-mono text-[0.875em];
 }
 .prose pre {
-  @apply mb-4 overflow-x-auto rounded-lg border bg-card p-4 font-mono text-sm leading-relaxed;
+  @apply mb-4 overflow-x-auto rounded-lg border bg-card py-4 font-mono text-sm leading-relaxed;
+}
+.prose pre code {
+  font-variant-ligatures: none;
+  display: grid;
+  min-width: max-content;
+}
+.prose [data-line] {
+  @apply px-4;
+}
+.prose [data-highlighted-line] {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  box-shadow: inset 2px 0 var(--primary);
+}
+.prose figure[data-rehype-pretty-code-figure] {
+  @apply mb-4;
+}
+.prose figure[data-rehype-pretty-code-figure] pre {
+  @apply mb-0;
+}
+.prose figcaption[data-rehype-pretty-code-title] {
+  @apply rounded-t-lg border border-b-0 bg-muted px-4 py-2 font-mono text-xs text-muted-foreground;
+}
+.prose figcaption[data-rehype-pretty-code-title] + [data-code-block] pre {
+  @apply rounded-t-none;
 }
 .prose pre span,
 .prose code span {
@@ -182,7 +206,11 @@
   @apply h-auto max-w-full rounded-lg border;
 }
 .prose table {
-  @apply w-full border-collapse text-sm;
+  @apply mb-4 w-full border-collapse text-sm;
+}
+.prose td code,
+.prose th code {
+  @apply whitespace-nowrap;
 }
 .prose th,
 .prose td {
