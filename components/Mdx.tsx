@@ -4,6 +4,7 @@ import rehypeSlug from 'rehype-slug';
 import rehypePrettyCode from 'rehype-pretty-code';
 import Link from 'next/link';
 import type { ComponentProps } from 'react';
+import { CodeBlock } from './CodeBlock';
 
 function A({ href = '', ...props }: ComponentProps<'a'>) {
   if (href.startsWith('/') || href.startsWith('#')) return <Link href={href} {...props} />;
@@ -14,7 +15,7 @@ export function Mdx({ source }: { source: string }) {
   return (
     <MDXRemote
       source={source}
-      components={{ a: A }}
+      components={{ a: A, pre: CodeBlock }}
       options={{
         mdxOptions: {
           remarkPlugins: [remarkGfm],
