@@ -1,0 +1,190 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #18181b;
+  --card: #fafaf9;
+  --card-foreground: #18181b;
+  --popover: #ffffff;
+  --popover-foreground: #18181b;
+  --primary: #1d4ed8;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --muted: #f4f4f5;
+  --muted-foreground: #52525b;
+  --accent: #eef2ff;
+  --accent-foreground: #1e3a8a;
+  --destructive: #b91c1c;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #1d4ed8;
+  --live: #15803d;
+  --progress: #a16207;
+}
+
+.dark {
+  --background: #0b0b0c;
+  --foreground: #f4f4f5;
+  --card: #141416;
+  --card-foreground: #f4f4f5;
+  --popover: #141416;
+  --popover-foreground: #f4f4f5;
+  --primary: #60a5fa;
+  --primary-foreground: #0b0b0c;
+  --secondary: #1c1c1f;
+  --secondary-foreground: #f4f4f5;
+  --muted: #1c1c1f;
+  --muted-foreground: #a1a1aa;
+  --accent: #172554;
+  --accent-foreground: #dbeafe;
+  --destructive: #f87171;
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #60a5fa;
+  --live: #4ade80;
+  --progress: #facc15;
+}
+
+@theme inline {
+  --font-sans: var(--font-jakarta), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, 'SF Mono', Menlo, monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-live: var(--live);
+  --color-progress: var(--progress);
+  --radius-lg: 0.75rem;
+  --radius-md: 0.5rem;
+  --radius-sm: 0.375rem;
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    line-height: 1.65;
+    transition:
+      background-color 0.3s,
+      color 0.3s;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply tracking-tight;
+    line-height: 1.2;
+  }
+  a {
+    text-underline-offset: 3px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+/* Entrance on first paint. CSS only, so it plays before hydration and never hides content from no-JS users. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+.rise {
+  animation: rise 0.8s var(--ease-out-expo) both;
+  animation-delay: calc(var(--i, 0) * 100ms + 100ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    animation: none;
+  }
+}
+
+/* MDX content */
+.prose > :last-child {
+  margin-bottom: 0;
+}
+.prose p {
+  margin-bottom: 1rem;
+}
+.prose h2 {
+  @apply mt-10 mb-3 text-2xl font-semibold;
+}
+.prose h3 {
+  @apply mt-8 mb-2 text-lg font-semibold;
+}
+.prose ul {
+  @apply mb-4 list-disc pl-6;
+}
+.prose ol {
+  @apply mb-4 list-decimal pl-6;
+}
+.prose li {
+  @apply mb-1;
+}
+.prose a {
+  @apply text-primary underline decoration-primary/40 transition-colors hover:decoration-primary;
+}
+.prose :not(pre) > code {
+  @apply rounded border bg-muted px-1.5 py-0.5 font-mono text-[0.875em];
+}
+.prose pre {
+  @apply mb-4 overflow-x-auto rounded-lg border bg-card p-4 font-mono text-sm leading-relaxed;
+}
+.prose pre span,
+.prose code span {
+  color: var(--shiki-light);
+}
+.dark .prose pre span,
+.dark .prose code span {
+  color: var(--shiki-dark);
+}
+.prose blockquote {
+  @apply my-4 border-l-4 pl-4 text-muted-foreground;
+}
+.prose img,
+.prose video {
+  @apply h-auto max-w-full rounded-lg border;
+}
+.prose table {
+  @apply w-full border-collapse text-sm;
+}
+.prose th,
+.prose td {
+  @apply border px-3 py-2 text-left;
+}

@@ -8,13 +8,10 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? 'github' : 'list',
-  use: {
-    baseURL: `http://127.0.0.1:${PORT}`,
-    trace: 'retain-on-failure',
-  },
+  use: { baseURL: `http://127.0.0.1:${PORT}`, trace: 'retain-on-failure', reducedMotion: 'reduce' },
   // Tests run against the production build, so `pnpm build` must come first.
   webServer: {
-    command: `pnpm preview --host 127.0.0.1 --port ${PORT}`,
+    command: `pnpm start --hostname 127.0.0.1 --port ${PORT}`,
     url: `http://127.0.0.1:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
