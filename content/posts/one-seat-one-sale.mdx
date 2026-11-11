@@ -1,0 +1,146 @@
+---
+title: One seat, one sale - letting Postgres hold the line
+description: How a partial unique index stops double booking in a cinema service, and a test that proves it under concurrent load.
+date: 2026-11-10
+tags: [postgres, typescript, concurrency]
+draft: false
+---
+
+When two people click the same seat at the same moment, application code that does "check, then insert" will eventually sell it twice.
+The check and the insert are two steps, and another request can slip in between them.
+The fix is to make the database refuse the second sale, so the rule holds no matter how many app servers are running.
+
+## The rule, as an index
+
+A seat can have at most one active hold or booking per showtime.
+Expired or released rows should not count, so the constraint is a **partial** unique index.
+
+```sql title="migrations/003_seat_holds.sql"
+create table seat_holds (
+  id          bigint generated always as identity primary key,
+  showtime_id bigint      not null,
+  seat_id     bigint      not null,
+  user_id     bigint      not null,
+  status      text        not null check (status in ('held', 'confirmed', 'released')),
+  expires_at  timestamptz not null
+);
+
+create unique index seat_holds_one_active
+  on seat_holds (showtime_id, seat_id)
+  where status in ('held', 'confirmed');
+```
+
+Two concurrent inserts for the same seat now race at the index, and Postgres lets exactly one of them win.
+The loser gets error code `23505`, `unique_violation`.
+
+## Holding a seat
+
+The service releases stale holds first, then inserts.
+Both statements run in one transaction, so a crash in the middle leaves nothing half done.
+
+```ts title="src/bookings/hold-seat.ts" {22-26,32}
+import type { Pool } from 'pg';
+
+export class SeatTakenError extends Error {}
+
+interface HoldInput {
+  showtimeId: number;
+  seatId: number;
+  userId: number;
+}
+
+export async function holdSeat(pool: Pool, input: HoldInput) {
+  const client = await pool.connect();
+  try {
+    await client.query('begin');
+    await client.query(
+      `update seat_holds set status = 'released'
+       where showtime_id = $1 and seat_id = $2
+         and status = 'held' and expires_at < now()`,
+      [input.showtimeId, input.seatId],
+    );
+    const { rows } = await client.query(
+      `insert into seat_holds
+         (showtime_id, seat_id, user_id, status, expires_at)
+       values ($1, $2, $3, 'held', now() + interval '10 minutes')
+       returning id, expires_at`,
+      [input.showtimeId, input.seatId, input.userId],
+    );
+    await client.query('commit');
+    return rows[0] as { id: number; expires_at: Date };
+  } catch (err) {
+    await client.query('rollback');
+    if ((err as { code?: string }).code === '23505') throw new SeatTakenError();
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+```
+
+The highlighted lines are the two that matter: the insert that the index guards, and the translation of `23505` into a domain error the API can turn into a clean `409`.
+
+## Proving it
+
+A rule you have not attacked is a guess.
+This test fires 20 holds for the same seat at once and expects exactly one winner.
+
+```ts title="tests/hold-seat.concurrency.test.ts"
+import { describe, expect, it } from 'vitest';
+import { holdSeat, SeatTakenError } from '../src/bookings/hold-seat';
+import { pool } from './helpers/pool';
+
+describe('holdSeat', () => {
+  it('lets exactly one of 20 concurrent requests win', async () => {
+    const attempts = Array.from({ length: 20 }, (_, i) => holdSeat(pool, { showtimeId: 1, seatId: 7, userId: i + 1 }));
+
+    const results = await Promise.allSettled(attempts);
+    const won = results.filter((r) => r.status === 'fulfilled');
+    const lost = results.filter((r) => r.status === 'rejected' && r.reason instanceof SeatTakenError);
+
+    expect(won).toHaveLength(1);
+    expect(lost).toHaveLength(19);
+  });
+});
+```
+
+It runs against a real Postgres started with Testcontainers.
+A mocked database would pass this test without proving anything, because the mock has no index to race on.
+
+```bash
+pnpm test -- hold-seat.concurrency
+```
+
+## Choosing the mechanism
+
+| Approach                | Holds under many app servers | Cost                                |
+| :---------------------- | :--------------------------- | :---------------------------------- |
+| Check, then insert      | No                           | Cheap, but wrong                    |
+| In-process mutex        | No                           | Breaks with a second instance       |
+| `select ... for update` | Yes                          | Locks rows, must lock the right one |
+| Partial unique index    | Yes                          | One index, constant-time check      |
+
+I still take an advisory lock per showtime when a booking touches several seats, because a single index cannot express "all of these or none".
+For one seat at a time, the index alone is enough.
+
+> The database is the only component that sees every request.
+> Put the rule where everyone passes through.
+
+## What the API returns
+
+The route maps the domain error to an honest status and a body the client can show to the user.
+
+```json
+{
+  "error": "seat_taken",
+  "message": "That seat was just taken. Pick another one.",
+  "showtimeId": 1,
+  "seatId": 7
+}
+```
+
+Things to remember:
+
+1. Make the constraint match the rule exactly, including which rows count.
+2. Translate `23505` once, in one place.
+3. Test the race with a real database and real concurrency, not a sequence of calls.
