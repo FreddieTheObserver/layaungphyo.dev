@@ -32,11 +32,61 @@ test('theme toggle switches and persists', async ({ page }) => {
   await page.goto('/');
   const html = page.locator('html');
   await expect(html).not.toHaveClass(/dark/);
-  const toggle = page.getByRole('button', { name: 'Switch to dark mode' });
+  const toggle = page.getByRole('button', { name: 'Switch to dark mode' }).filter({ visible: true });
+  if (!(await toggle.count())) await page.getByRole('button', { name: 'Open menu' }).click();
   await toggle.first().click();
   await expect(html).toHaveClass(/dark/);
   await page.reload();
   await expect(html).toHaveClass(/dark/);
+});
+
+test('mobile menu marks the current page and closes on navigation', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mobile', 'the menu only exists on small screens');
+  await page.goto('/blog');
+  await page.getByRole('button', { name: 'Open menu' }).click();
+  const menu = page.getByRole('navigation', { name: 'Mobile' });
+  await expect(menu.getByRole('link', { name: 'Blog' })).toHaveAttribute('aria-current', 'true');
+  await page.getByRole('button', { name: 'Close menu' }).click();
+  await expect(menu).toBeHidden();
+  await page.getByRole('button', { name: 'Open menu' }).click();
+  await menu.getByRole('link', { name: 'Work' }).click();
+  await expect(page).toHaveURL(/\/#work$/);
+  await expect(menu).toBeHidden();
+});
+
+test('mobile menu scrolls to the section, even when the hash is unchanged', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mobile', 'the menu only exists on small screens');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/');
+  const work = page.locator('#work');
+  for (let tap = 0; tap < 2; tap++) {
+    await page.getByRole('button', { name: 'Open menu' }).click();
+    await page.getByRole('navigation', { name: 'Mobile' }).getByRole('link', { name: 'Work' }).click();
+    await expect(page).toHaveURL(/\/#work$/);
+    await expect(work).toBeInViewport();
+    await page.evaluate(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' }));
+    await expect(work).not.toBeInViewport();
+  }
+});
+
+test('mobile menu stays usable on short screens', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mobile', 'the menu only exists on small screens');
+  await page.setViewportSize({ width: 600, height: 320 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Open menu' }).click();
+  const resume = page.getByRole('link', { name: 'Résumé' });
+  await resume.scrollIntoViewIfNeeded();
+  await expect(resume).toBeInViewport({ ratio: 1 });
+  await expect(page.getByRole('button', { name: 'Close menu' })).toBeInViewport({ ratio: 1 });
+});
+
+test('mobile menu shows everything on a normal phone without scrolling', async ({ page }, info) => {
+  test.skip(info.project.name !== 'mobile', 'the menu only exists on small screens');
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Open menu' }).click();
+  const box = await page.getByRole('link', { name: 'Résumé' }).boundingBox();
+  const height = page.viewportSize()!.height;
+  expect(box!.y + box!.height).toBeLessThanOrEqual(height);
 });
 
 test('blog index links to a post and back', async ({ page }) => {

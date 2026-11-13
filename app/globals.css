@@ -129,8 +129,15 @@
   animation-delay: calc(var(--i, 0) * 100ms + 100ms);
 }
 
+/* Shorter variant for the mobile menu, which mounts on every open. */
+.menu-rise {
+  animation: rise 0.45s var(--ease-out-expo) both;
+  animation-delay: calc(var(--i, 0) * 50ms + 120ms);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .rise {
+  .rise,
+  .menu-rise {
     animation: none;
   }
 }
