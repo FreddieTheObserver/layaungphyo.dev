@@ -1,7 +1,7 @@
 ---
 order: 1
 name: cafe-pos
-status: In progress
+status: Completed
 summary: A cafe POS backend where the self-order kiosk is a first-class client.
 stack: [TypeScript, NestJS, PostgreSQL, Drizzle, Redis]
 links:
