@@ -45,11 +45,9 @@ export const principles = [
 ];
 
 export const now = {
-  updated: 'October 2026',
+  updated: 'November 2026',
   items: [
-    'Building cafe-pos, a NestJS backend with self-order kiosks as first-class clients.',
-    'Mentoring CS juniors on CSC102 practice sets.',
-    'Sending my first open-source PR: setup docs for unishare.',
-    'Keeping floodwatch running through the Bangkok floods.',
+    'Building Eaves\'s website and CMS , a fictional architectural and interior design studio in Bangkok.',
+    'Mentoring CS juniors on CSC102(Introduction To Programming In Java) weekly',
   ],
 };
