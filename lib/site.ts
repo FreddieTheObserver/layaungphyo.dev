@@ -47,7 +47,7 @@ export const principles = [
 export const now = {
   updated: 'November 2026',
   items: [
-    'Building Eaves\'s website and CMS , a fictional architectural and interior design studio in Bangkok.',
+    "Building Eaves's website and CMS, a fictional architectural and interior design studio in Bangkok.",
     'Mentoring CS juniors on CSC102(Introduction To Programming In Java) weekly',
   ],
 };
