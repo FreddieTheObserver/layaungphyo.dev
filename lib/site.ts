@@ -12,7 +12,7 @@ export const site = {
   // Set to the real profile URL; the link is hidden while this is null.
   linkedin: null as string | null,
   // Drop the PDF into public/ before going live.
-  resume: '/freddie-resume.pdf',
+  resume: '/La_Yaung_Phyo_Resume.pdf',
 };
 
 export const nav = [
