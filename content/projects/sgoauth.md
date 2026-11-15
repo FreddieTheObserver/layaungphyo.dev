@@ -1,5 +1,5 @@
 ---
-order: 4
+order: 7
 name: sgoauth
 status: Study
 summary: Sign in with Google, hardened.

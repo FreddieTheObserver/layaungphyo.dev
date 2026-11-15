@@ -1,5 +1,5 @@
 ---
-order: 6
+order: 3
 name: floodwatch
 status: Completed
 summary: River and rain alerts for Bangkok, on Telegram.

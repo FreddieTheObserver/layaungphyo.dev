@@ -1,5 +1,5 @@
 ---
-order: 3
+order: 6
 name: subsync
 status: Completed
 summary: Track every subscription in one place and get warned before it renews.

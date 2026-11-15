@@ -1,5 +1,5 @@
 ---
-order: 2
+order: 5
 name: crisistrade
 status: Completed
 summary: A marketplace for disasters, when shops and money stop working. Won the SIT 2026 hackathon.
