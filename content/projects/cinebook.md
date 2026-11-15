@@ -1,7 +1,7 @@
 ---
 order: 5
 name: cinebook
-status: In progress
+status: Completed
 summary: Cinema booking where a seat can only sell once.
 stack: [Go, PostgreSQL, Testcontainers]
 links:

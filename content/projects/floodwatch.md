@@ -1,7 +1,7 @@
 ---
 order: 6
 name: floodwatch
-status: Live
+status: Completed
 summary: River and rain alerts for Bangkok, on Telegram.
 stack: [Go, PostgreSQL, sqlc, Telegram, GitHub Actions]
 links:
